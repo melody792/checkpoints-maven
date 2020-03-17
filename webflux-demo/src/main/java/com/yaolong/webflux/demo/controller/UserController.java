@@ -104,6 +104,11 @@ public class UserController {
                 .defaultIfEmpty(new ResponseEntity<User>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * 根据id删除
+     * @param id
+     * @return
+     */
     @DeleteMapping("/deleteUser/{id}")
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable String id) {
 

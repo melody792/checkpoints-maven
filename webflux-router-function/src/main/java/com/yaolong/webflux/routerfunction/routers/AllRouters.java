@@ -26,16 +26,15 @@ public class AllRouters {
                         .path("/user"),
                 RouterFunctions
                         //相当于@GetMaping("/getAll")
-                        .route(RequestPredicates.GET("/getAll"),handler::getAllUser))
+                        .route(RequestPredicates.GET("/getAll"),handler::getAllUser)
                         //相当于@PostTMaping("/createUser")
-
                         .andRoute(RequestPredicates.POST("/createUser").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),handler::createUser)
                         //相当于@GetMaping("/findUserById/{id}")
 
                         .andRoute(RequestPredicates.GET("/findUserById/{id}"),handler::findUserById)
                         //相当于@DleteTMaping("/deleteUserById/{id}")
 
-                        .andRoute(RequestPredicates.DELETE("/deleteUserById/{id}"),handler::deleteUserById);
+                        .andRoute(RequestPredicates.DELETE("/deleteUserById/{id}"),handler::deleteUserById));
 
     }
 }
