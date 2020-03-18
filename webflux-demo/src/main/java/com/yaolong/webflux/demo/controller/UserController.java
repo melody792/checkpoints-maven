@@ -48,7 +48,7 @@ public class UserController {
      *
      * @return
      */
-    @GetMapping("/getAll")
+    @GetMapping("/getAllUser")
     public Flux<User> getAll() {
         return this
                 .repository.findAll();
@@ -109,8 +109,8 @@ public class UserController {
      * @param id
      * @return
      */
-    @DeleteMapping("/deleteUser/{id}")
-    public Mono<ResponseEntity<Void>> deleteUser(@PathVariable String id) {
+    @DeleteMapping("/deleteUserById/{id}")
+    public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("id") String id) {
 
         //此方法返回值为Mono无法判断数据是否存在，不能直接使用
         //this.repository.deleteById(id);
@@ -135,7 +135,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/findUserById/{id}")
-    public Mono<ResponseEntity<User>> findUserById(@PathVariable String id) {
+    public Mono<ResponseEntity<User>> findUserById(@PathVariable("id") String id) {
         return this
                 .repository.findById(id)
                 .map(user -> new ResponseEntity<User>(HttpStatus.OK))

@@ -1,6 +1,0 @@
-server:
-  port: 8080
-spring:
-  data:
-    mongodb:
-      uri: mongodb://sa:sa@lian.yaolong.top:27017/webflux
