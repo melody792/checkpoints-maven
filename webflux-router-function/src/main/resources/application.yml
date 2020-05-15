@@ -3,4 +3,4 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://sa:sa@lian.yaolong.top:27017/webflux
+      uri: mongodb://localhost:27017/webflux
