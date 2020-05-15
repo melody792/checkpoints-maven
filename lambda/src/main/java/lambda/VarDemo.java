@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 /**
  * @program: webflux
  * @description: 类型推断
- * @author: yaolong
+ * @author: pzb
  * @create: 2020-03-13 16:01
  **/
 public class VarDemo {

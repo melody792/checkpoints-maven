@@ -5,7 +5,7 @@ import java.util.function.Function;
 /**
  * @program: webflux
  * @description: 级联表达式和科利华
- * @author: yaolong
+ * @author: pzb
  * @create: 2020-03-13 16:09
  **/
 public class CurryDemo {

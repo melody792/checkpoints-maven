@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * @program: webflux
  * @description: 并行流测试
- * @author: yaolong
+ * @author: pzb
  * @create: 2020-03-14 21:48
  **/
 public class ParallelStream {

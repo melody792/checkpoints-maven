@@ -12,7 +12,7 @@ package lambda.stream;
 /**
  * @program: webflux
  * @description: 收集器
- * @author: yaolong
+ * @author: pzb
  * @create: 2020-03-15 13:03
  **/
 public class StreamCollector {
