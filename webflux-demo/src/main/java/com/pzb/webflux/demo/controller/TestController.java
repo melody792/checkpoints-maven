@@ -1,12 +1,17 @@
 package com.pzb.webflux.demo.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -20,6 +25,20 @@ import java.util.stream.IntStream;
 @RequestMapping("/test")
 @Slf4j
 public class TestController {
+    private static final String baseUrl = "http://localhost:8082";
+
+    @GetMapping("/list/{names}")
+    public Mono<String> request(@PathVariable List<String> names) {
+        return WebClient.create(baseUrl).get()
+                .uri(uriBuilder -> uriBuilder.path("/test/getList")
+                        .path("/" + names).build()
+                )
+                .retrieve()
+                .onStatus(HttpStatus::isError, clientResponse -> {
+                    return Mono.error(new Exception(clientResponse.statusCode() + "error code"));
+                })
+                .bodyToMono(String.class);
+    }
 
     /**
      * 普通案例
@@ -33,7 +52,6 @@ public class TestController {
         log.info("get1 end");
         return s;
     }
-
 
     /**
      * mono案例

@@ -1,5 +1,6 @@
 package com.pzb.webflux.routerfunction.routers;
 
+import com.pzb.webflux.routerfunction.handlers.TestHandler;
 import com.pzb.webflux.routerfunction.handlers.UserHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,5 +37,12 @@ public class AllRouters {
 
                         .andRoute(RequestPredicates.DELETE("/deleteUserById/{id}"),handler::deleteUserById));
 
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> testRouters(TestHandler testHandler) {
+        return RouterFunctions
+                .nest(RequestPredicates.path("/test"),
+                        RouterFunctions.route(RequestPredicates.GET("/getList/{names}"), testHandler::testList));
     }
 }
