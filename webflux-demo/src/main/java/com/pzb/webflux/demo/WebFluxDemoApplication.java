@@ -1,7 +1,9 @@
 package com.pzb.webflux.demo;
 
+import com.pzb.webflux.demo.service.CsvHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +25,11 @@ import java.util.Map;
 public class WebFluxDemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(WebFluxDemoApplication.class, args);
+    }
 
-
+    @Bean
+    public CsvHandler csvHandler() {
+        return new CsvHandler();
     }
 
     @RequestMapping("test")

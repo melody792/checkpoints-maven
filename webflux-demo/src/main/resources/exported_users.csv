@@ -1,0 +1,4 @@
+"ACTIVE","HRIS_EMPLOYEE_ID","USER_NAME","EMAIL_ADDRESS","FIRST_NAME","MIDDLE_NAME","LAST_NAME","LOCALE","COUNTRY","JOB_TITLE","SSO_ENABLED","PHONE_NUMBER","PHONE_EXTENSION","FAX_NUMBER","TIMEZONE","VALIDITY_DATE","EXPIRATION_DATE","LAST_LOGIN","SEND_PASSWORD_EMAIL","USER_CATEGORY","IBMMarketEnablements","IWR_USER_TYPE","IWR_ACCESS","MYCA_USER_TYPE","MYCA_ACCESS","TS_ADMIN_USER_TYPE","TS_ADMIN_ACCESS","WCA_USER_TYPE","WCA_ACCESS"
+"1","sapenmat","sapenmat","sapenmat@in.ibm.com","Sairama",,"Penmatsa","en_US",,,"0",,,,,"2019-03-19","","2019-03-19",,,,,,,,"ADMIN","1",,
+"1","someusername","someusername","sunhuij@cn.ibm.com","FirstName",,"LastName","en_US",,,"0",,,,,"2019-03-15","","2020-02-13",,"IBM",,"IWR_ADMIN","1",,,"WCC_ADMIN_GETTINGSTARTED|ADMIN","1",,
+"0","IBMTestAccount","IBMTestAccount","sunhuij@cn.ibm.com","IBMTestAccount",,"IBMTestAccount","en_US",,,"0",,,,,"2019-04-17","","2019-04-18",,,,,,"EE","1",,,,

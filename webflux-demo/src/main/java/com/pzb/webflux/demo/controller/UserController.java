@@ -1,8 +1,15 @@
 package com.pzb.webflux.demo.controller;
 
-import com.pzb.webflux.demo.domain.User;
+import com.pzb.webflux.demo.domain.UserDemo;
+import com.pzb.webflux.demo.domain.UserFields;
 import com.pzb.webflux.demo.repository.UserRepository;
+import com.pzb.webflux.demo.service.CsvHandler;
+import com.pzb.webflux.demo.service.UserService;
 import com.pzb.webflux.demo.utils.CheckUtils;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,18 +37,44 @@ import reactor.core.publisher.Mono;
  **/
 @RestController
 @RequestMapping("/user")
+@Slf4j
+@AllArgsConstructor
 public class UserController {
 
     private final UserRepository repository;
+
+    private final UserService userService;
+
+    private final CsvHandler csvHandler;
+
+
+    @RequestMapping(path = "/ingest/{tenantId}", method = RequestMethod.POST)
+    public ResponseEntity ingestUser(@PathVariable String tenantId, @RequestPart("file") MultipartFile file) throws Exception {
+
+        Flux.fromIterable(csvHandler.getUsers(file.getInputStream()))
+                .map(u -> { // set client id in jwt
+                    u.getAttributes().put(UserFields.ATTRIBUTE_CLIENT_ID, tenantId);
+                    return u;
+                })
+                .then().block();
+        log.info("user ingestion completed");
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getUsers")
+    public Flux<UserDemo> getUsers() {
+        return this.userService.getUsers();
+    }
 
     /**
      * 构造器获取注入的Bean
      *
      * @param repository
      */
-    public UserController(UserRepository repository) {
-        this.repository = repository;
-    }
+//    public UserController(UserRepository repository, CsvHandler csvHandler) {
+//        this.repository = repository;
+//        this.csvHandler = csvHandler;
+//    }
 
     /**
      * 以数组的形式一次性返回
@@ -46,9 +82,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/getAllUser")
-    public Flux<User> getAll() {
-        return this
-                .repository.findAll();
+    public Flux<UserDemo> getAll() {
+        return this.repository.findAll();
     }
 
     /**
@@ -57,48 +92,47 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getStreamAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<User> getStreamAll() {
-        return this
-                .repository.findAll();
+    public Flux<UserDemo> getStreamAll() {
+        return this.repository.findAll();
     }
 
     /**
      * 添加数据
      *
-     * @param user
+     * @param userDemo
      * @return
      */
     @PostMapping("/createUser")
-    public Mono<User> createUser(@Validated @RequestBody User user) {
+    public Mono<UserDemo> createUser(@Validated @RequestBody UserDemo userDemo) {
         //spring data jap 里面，新增和修改的方法都是save，有id是修改，没有id是新增
         //校验name是否合法
-        CheckUtils.checkName(user.getName());
-        user.setId(null);
+        CheckUtils.checkName(userDemo.getName());
+        userDemo.setId(null);
         return this
-                .repository.save(user);
+                .repository.save(userDemo);
 
     }
 
     /**
      * 修改数据
      *
-     * @param user
+     * @param userDemo
      * @return
      */
     @PutMapping("/updateUser")
-    public Mono<ResponseEntity<User>> updateUser(@Validated @RequestBody User user) {
+    public Mono<ResponseEntity<UserDemo>> updateUser(@Validated @RequestBody UserDemo userDemo) {
         //spring data jap 里面，新增和修改的方法都是save，有id是修改，没有id是新增
         //校验name是否合法
-        CheckUtils.checkName(user.getName());
+        CheckUtils.checkName(userDemo.getName());
         return this
-                .repository.findById(user.getId())
+                .repository.findById(userDemo.getId())
                 .flatMap(u -> {
-                    u.setName(user.getName());
-                    u.setAge(user.getAge());
+                    u.setName(userDemo.getName());
+                    u.setAge(userDemo.getAge());
                     return this.repository.save(u);
                 })
-                .map(u -> new ResponseEntity<User>(HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<User>(HttpStatus.NOT_FOUND));
+                .map(u -> new ResponseEntity<UserDemo>(HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<UserDemo>(HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -118,7 +152,7 @@ public class UserController {
                 .repository.findById(id)
                 //map不操作数据，值只转换数据
                 //flatMap操作数据返回一个Mono(此处是接收到查询的用户再删除这个用户)
-                .flatMap(user -> this.repository.deleteById(user.getId())
+                .flatMap(userDemo -> this.repository.deleteById(userDemo.getId())
                         //成功返回一个mono
                         .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK))))
                 //失败返回一个mono
@@ -132,11 +166,11 @@ public class UserController {
      * @return
      */
     @GetMapping("/findUserById/{id}")
-    public Mono<ResponseEntity<User>> findUserById(@PathVariable("id") String id) {
+    public Mono<ResponseEntity<UserDemo>> findUserById(@PathVariable("id") String id) {
         return this
                 .repository.findById(id)
-                .map(user -> new ResponseEntity<User>(HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<User>(HttpStatus.NOT_FOUND));
+                .map(userDemo -> new ResponseEntity<UserDemo>(HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<UserDemo>(HttpStatus.NOT_FOUND));
     }
 
     /**
@@ -147,7 +181,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/findByAge/{start}/{end}")
-    public Flux<User> findByAge(@PathVariable int start, @PathVariable int end) {
+    public Flux<UserDemo> findByAge(@PathVariable int start, @PathVariable int end) {
         return this
                 .repository.findByAgeBetween(start, end);
     }
@@ -159,7 +193,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/findStreamByAge/{start}/{end}",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<User> findStreamByAge(@PathVariable int start, @PathVariable int end) {
+    public Flux<UserDemo> findStreamByAge(@PathVariable int start, @PathVariable int end) {
         return this
                 .repository.findByAgeBetween(start, end);
     }
@@ -170,7 +204,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/oldUser/{start}/{end}")
-    public Flux<User> oldUser(@PathVariable int start, @PathVariable int end) {
+    public Flux<UserDemo> oldUser(@PathVariable int start, @PathVariable int end) {
         return this
                 .repository.oldUser(start, end);
     }
@@ -181,7 +215,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/oldStreamUser/{start}/{end}",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<User> oldStreamUser(@PathVariable int start, @PathVariable int end) {
+    public Flux<UserDemo> oldStreamUser(@PathVariable int start, @PathVariable int end) {
         return this
                 .repository.oldUser(start, end);
     }

@@ -1,33 +1,43 @@
 package com.pzb.webflux.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
+import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
+import java.util.Map;
 
-
-/**
- * @program: webflux-demo
- * @description:
- * @author: pzb
- * @create: 2020-03-16 17:54
- **/
-@Document(collection ="user" )
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
+	private String id;
+	private String username;
+	private String email;
+	private String firstName;
+	private String lastName;
 
-    @Id
-    private String id;
+	private String password;
 
-    @NotBlank
-    private String name;
+	private Map<String, String> attributes;
 
-    @Range(max = 100,min = 10)
-    private int age;
+	@JsonIgnore
+	private Map<String, String> roles;
+	@JsonIgnore
+	private IMPORT_STATUS status;
+
+	public enum IMPORT_STATUS{
+		ADD,UPDATE,DELETE
+	}
+	
 }
