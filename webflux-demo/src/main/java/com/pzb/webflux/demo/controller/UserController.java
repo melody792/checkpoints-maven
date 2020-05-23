@@ -1,15 +1,15 @@
 package com.pzb.webflux.demo.controller;
 
+import com.pzb.webflux.demo.domain.TaskInfo;
 import com.pzb.webflux.demo.domain.UserDemo;
 import com.pzb.webflux.demo.domain.UserFields;
+import com.pzb.webflux.demo.repository.UserDemoRepository;
 import com.pzb.webflux.demo.repository.UserRepository;
 import com.pzb.webflux.demo.service.CsvHandler;
 import com.pzb.webflux.demo.service.UserService;
 import com.pzb.webflux.demo.utils.CheckUtils;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,8 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class UserController {
 
-    private final UserRepository repository;
+    private final UserDemoRepository repository;
+    private final UserRepository userRepository;
 
     private final UserService userService;
 
@@ -50,15 +51,26 @@ public class UserController {
 
     @RequestMapping(path = "/ingest/{tenantId}", method = RequestMethod.POST)
     public ResponseEntity ingestUser(@PathVariable String tenantId, @RequestPart("file") MultipartFile file) throws Exception {
-
+        TaskInfo info = TaskInfo.builder().build();
         Flux.fromIterable(csvHandler.getUsers(file.getInputStream()))
                 .map(u -> { // set client id in jwt
                     u.getAttributes().put(UserFields.ATTRIBUTE_CLIENT_ID, tenantId);
                     return u;
                 })
+                .flatMap(user -> {
+                    info.setCount(info.getCount()+1);
+                    if (info.getCount() == 3) {
+                        int i = 1/0;
+                    }
+                    return userRepository.save(user);
+                })
+                .doOnError(ex -> {
+                    info.setMessage(ex.getMessage());//会继续抛出异常,结束流
+                })
+                //.onErrorResume()
                 .then().block();
         log.info("user ingestion completed");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(info);
     }
 
     @GetMapping("/getUsers")

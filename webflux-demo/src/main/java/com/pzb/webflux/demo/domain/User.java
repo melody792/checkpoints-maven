@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document(collection = "user-manager")
 public class User {
 	private String id;
 	private String username;

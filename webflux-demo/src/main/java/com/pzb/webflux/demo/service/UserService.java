@@ -2,20 +2,18 @@ package com.pzb.webflux.demo.service;
 
 import com.google.common.collect.Lists;
 import com.pzb.webflux.demo.domain.UserDemo;
-import com.pzb.webflux.demo.repository.UserRepository;
+import com.pzb.webflux.demo.repository.UserDemoRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
 import java.util.Random;
-import java.util.RandomAccess;
 
 @Component
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserDemoRepository userDemoRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserDemoRepository userDemoRepository) {
+        this.userDemoRepository = userDemoRepository;
     }
 
     public Flux<UserDemo> getUsers() {
@@ -29,7 +27,7 @@ public class UserService {
         Random random = new Random();
         Flux<UserDemo> userDemoFlux = Flux.fromIterable(Lists.newArrayList(userDemo1, userDemo2));
         if (random.nextInt(2) == 1) {
-            userDemoFlux = userRepository.findAll();
+            userDemoFlux = userDemoRepository.findAll();
         }
         return userDemoFlux;
     }
